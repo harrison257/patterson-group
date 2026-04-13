@@ -1,0 +1,9 @@
+{
+  "name": "patterson-group-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Patterson Group — Colorado Springs Real Estate",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
