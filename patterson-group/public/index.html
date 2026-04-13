@@ -154,11 +154,17 @@
     /* ============ HERO ============ */
     #hero {
       position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background:
-        linear-gradient(165deg, rgba(14,28,47,0.85) 0%, rgba(14,28,47,0.6) 40%, rgba(14,28,47,0.75) 100%),
-        url('https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1920&q=80') center/cover no-repeat;
+      background-color: var(--navy);
       color: var(--white); text-align: center; padding: 120px 24px 60px;
     }
+    #hero::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        linear-gradient(165deg, rgba(14,28,47,0.85) 0%, rgba(14,28,47,0.6) 40%, rgba(14,28,47,0.75) 100%),
+        var(--hero-bg, url('https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1920&q=80')) center/cover no-repeat;
+      z-index: 0;
+    }
+    #hero > * { position: relative; z-index: 1; }
 
     .hero-content { max-width: 800px; }
     .hero-eyebrow { font-weight: 500; font-size: 0.82rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
@@ -395,18 +401,30 @@
     .lifestyle-link:hover { gap: 12px; }
 
     /* ============ CONTACT ============ */
-    .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: start; }
-    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; gap: 48px; } }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: stretch; }
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; gap: 32px; } }
 
-    .contact-info h3 { font-size: 1.3rem; margin-bottom: 24px; }
-    .contact-detail { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
-    .contact-detail-icon {
-      width: 40px; height: 40px; border-radius: 8px; background: rgba(184,148,80,0.1);
-      display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1rem; flex-shrink: 0;
+    .contact-info {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 36px;
+      display: flex; flex-direction: column; justify-content: center;
     }
-    .contact-detail-text { font-size: 0.92rem; line-height: 1.6; }
-    .contact-detail-text a { color: var(--gold); transition: color 0.2s; }
-    .contact-detail-text a:hover { color: var(--gold-lt); }
+    .contact-info h3 { font-size: 1.4rem; margin-bottom: 28px; color: var(--white); }
+    .contact-detail { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    .contact-detail:last-child { margin-bottom: 0; }
+    .contact-detail-icon {
+      width: 44px; height: 44px; border-radius: 10px; background: rgba(184,148,80,0.12);
+      border: 1px solid rgba(184,148,80,0.2);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .contact-detail-icon svg { width: 20px; height: 20px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+    .contact-detail-text { font-size: 0.92rem; line-height: 1.7; }
+    .contact-detail-label {
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--gold); margin-bottom: 4px;
+    }
+    .contact-detail-text a { color: rgba(255,255,255,0.85); transition: color 0.2s; }
+    .contact-detail-text a:hover { color: var(--gold); }
 
     .contact-form {
       background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
@@ -521,6 +539,24 @@
           Explore our current properties in Colorado Springs and the Pikes Peak region.
         </p>
         <button class="admin-toggle" onclick="toggleAdmin()">&#9881; Manage Listings</button>
+        <button class="admin-toggle" onclick="toggleSettings()" style="margin-left:8px;">&#9881; Site Settings</button>
+      </div>
+
+      <!-- Site Settings Panel -->
+      <div class="admin-panel" id="settingsPanel">
+        <h4>Site Settings</h4>
+        <div class="admin-row">
+          <input type="text" id="heroImageUrl" class="admin-input" placeholder="Hero background image URL (paste image link)">
+          <div>
+            <button class="admin-btn" onclick="saveHeroImage()">Update Hero Image</button>
+          </div>
+        </div>
+        <p class="admin-help">
+          Paste a URL to any high-resolution image. Wide landscape photos work best (at least 1920px wide).
+          The image will appear behind the hero text at the top of the site.
+        </p>
+        <div id="currentHeroPreview" style="margin-top:12px;"></div>
+        <div class="admin-error" id="settingsError"></div>
       </div>
 
       <div class="admin-panel" id="adminPanel">
@@ -693,19 +729,32 @@
         <div class="contact-info">
           <h3>The Patterson Group, LLC</h3>
           <div class="contact-detail">
-            <div class="contact-detail-icon">&#9906;</div>
-            <div class="contact-detail-text">3470 Centennial Blvd, Suite 100<br>Colorado Springs, CO 80907</div>
+            <div class="contact-detail-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="contact-detail-text">
+              <div class="contact-detail-label">Office</div>
+              3470 Centennial Blvd, Suite 100<br>Colorado Springs, CO 80907
+            </div>
           </div>
           <div class="contact-detail">
-            <div class="contact-detail-icon">&#9742;</div>
+            <div class="contact-detail-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
             <div class="contact-detail-text">
+              <div class="contact-detail-label">Phone</div>
               <a href="tel:+18009001775">800-900-1775</a> Toll Free<br>
               <a href="tel:+17195751200">719-575-1200</a> Direct
             </div>
           </div>
           <div class="contact-detail">
-            <div class="contact-detail-icon">&#9993;</div>
-            <div class="contact-detail-text"><a href="mailto:info@PattersonGrp.com">info@PattersonGrp.com</a></div>
+            <div class="contact-detail-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22,6 12,13 2,6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="contact-detail-text">
+              <div class="contact-detail-label">Email</div>
+              <a href="mailto:info@PattersonGrp.com">info@PattersonGrp.com</a>
+            </div>
           </div>
         </div>
 
@@ -997,8 +1046,82 @@
       if (el) el.style.display = 'none';
     }
 
+    // ===== Site Settings (Hero Image) =====
+    var SETTINGS_URL = '/api/listings'; // reuse same endpoint with action: 'get_settings' / 'save_settings'
+
+    function toggleSettings() {
+      var panel = document.getElementById('settingsPanel');
+      var hidden = panel.style.display === 'none' || !panel.style.display;
+      if (hidden) { var pw = getAdminPassword(); if (!pw) return; panel.style.display = 'block'; loadSettings(); }
+      else { panel.style.display = 'none'; }
+    }
+
+    async function loadSettings() {
+      try {
+        var res = await fetch(API_URL + '?type=settings');
+        if (!res.ok) return;
+        var data = await res.json();
+        if (data.settings && data.settings.heroImage) {
+          document.getElementById('heroImageUrl').value = data.settings.heroImage;
+          showHeroPreview(data.settings.heroImage);
+        }
+      } catch(err) { console.error('Failed to load settings:', err); }
+    }
+
+    async function loadAndApplyHeroImage() {
+      try {
+        var res = await fetch(API_URL + '?type=settings');
+        if (!res.ok) return;
+        var data = await res.json();
+        if (data.settings && data.settings.heroImage) {
+          document.getElementById('hero').style.setProperty('--hero-bg', "url('" + data.settings.heroImage + "')");
+        }
+      } catch(err) { /* silently fail — default image shows */ }
+    }
+
+    async function saveHeroImage() {
+      var url = document.getElementById('heroImageUrl').value.trim();
+      if (!url) { showSettingsError('Please paste an image URL.'); return; }
+
+      var password = getAdminPassword();
+      if (!password) return;
+
+      try {
+        var res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+          body: JSON.stringify({ action: 'save_settings', settings: { heroImage: url } })
+        });
+        var data = await res.json();
+        if (res.status === 401) { clearAdminPassword(); showSettingsError('Incorrect password.'); return; }
+        if (!res.ok) { showSettingsError(data.error || 'Something went wrong.'); return; }
+
+        document.getElementById('hero').style.setProperty('--hero-bg', "url('" + url + "')");
+        showHeroPreview(url);
+        clearSettingsError();
+      } catch(err) { showSettingsError('Network error.'); }
+    }
+
+    function showHeroPreview(url) {
+      var el = document.getElementById('currentHeroPreview');
+      if (el) el.innerHTML = '<img src="' + url + '" style="width:100%;max-width:400px;border-radius:8px;margin-top:8px;border:1px solid var(--border);" alt="Current hero image">';
+    }
+
+    function showSettingsError(msg) {
+      var el = document.getElementById('settingsError');
+      if (el) { el.textContent = msg; el.style.display = 'block'; }
+    }
+    function clearSettingsError() {
+      var el = document.getElementById('settingsError');
+      if (el) el.style.display = 'none';
+    }
+
     // Init
-    (async function() { var listings = await loadListings(); renderListings(listings); })();
+    (async function() {
+      var listings = await loadListings();
+      renderListings(listings);
+      loadAndApplyHeroImage();
+    })();
   </script>
 </body>
 </html>
