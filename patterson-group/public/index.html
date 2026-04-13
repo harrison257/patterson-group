@@ -286,11 +286,12 @@
 
     /* Admin Panel */
     .admin-toggle {
-      display: inline-flex; align-items: center; gap: 6px;
+      display: none; align-items: center; gap: 6px;
       background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(184,148,80,0.3);
       padding: 8px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 500;
       transition: background 0.2s ease; margin-left: 16px;
     }
+    .admin-mode .admin-toggle { display: inline-flex; }
     .admin-toggle:hover { background: rgba(184,148,80,0.25); }
 
     .admin-panel {
@@ -828,6 +829,11 @@
 
   <!-- ======== JS ======== -->
   <script>
+    // ===== Admin Mode — add ?admin to URL to show admin controls =====
+    if (window.location.search.indexOf('admin') !== -1) {
+      document.body.classList.add('admin-mode');
+    }
+
     // ===== Mobile Nav =====
     function toggleMenu() {
       document.querySelector('.hamburger').classList.toggle('open');
