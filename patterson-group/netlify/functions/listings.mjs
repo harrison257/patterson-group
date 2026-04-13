@@ -2,6 +2,7 @@ import { getStore } from "@netlify/blobs";
 
 const STORE_NAME = "listings";
 const BLOB_KEY = "aryeo_listings";
+const SETTINGS_KEY = "site_settings";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -31,13 +32,38 @@ async function saveListings(listings) {
   await store.set(BLOB_KEY, JSON.stringify(listings));
 }
 
+async function getSettings() {
+  const store = getStore(STORE_NAME);
+  try {
+    const data = await store.get(SETTINGS_KEY);
+    if (!data) return {};
+    return JSON.parse(data);
+  } catch { return {}; }
+}
+
+async function saveSettings(settings) {
+  const store = getStore(STORE_NAME);
+  const existing = await getSettings();
+  const merged = { ...existing, ...settings };
+  await store.set(SETTINGS_KEY, JSON.stringify(merged));
+  return merged;
+}
+
 export default async function handler(request) {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers });
   }
 
-  // Public: get all listings
+  // Public: get listings or settings
   if (request.method === "GET") {
+    const url = new URL(request.url);
+    const type = url.searchParams.get("type");
+
+    if (type === "settings") {
+      const settings = await getSettings();
+      return new Response(JSON.stringify({ settings }), { status: 200, headers });
+    }
+
     const listings = await getListings();
     return new Response(JSON.stringify({ listings }), { status: 200, headers });
   }
@@ -107,6 +133,15 @@ export default async function handler(request) {
       }
       await saveListings(reordered);
       return new Response(JSON.stringify({ ok: true, listings: reordered }), { status: 200, headers });
+    }
+
+    if (action === "save_settings") {
+      const { settings } = body;
+      if (!settings || typeof settings !== "object") {
+        return new Response(JSON.stringify({ error: "Missing settings object." }), { status: 400, headers });
+      }
+      const updated = await saveSettings(settings);
+      return new Response(JSON.stringify({ ok: true, settings: updated }), { status: 200, headers });
     }
 
     return new Response(JSON.stringify({ error: "Unknown action." }), { status: 400, headers });
